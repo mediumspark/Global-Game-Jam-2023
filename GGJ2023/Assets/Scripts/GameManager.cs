@@ -15,7 +15,27 @@ namespace Managers
         private void Awake()
         {
             Singleton = this;
-            DontDestroyOnLoad(gameObject); 
+            DontDestroyOnLoad(gameObject);
+            SceneManager.sceneLoaded += SceneManager_sceneLoaded;
+        }
+
+        private void SceneManager_sceneLoaded(Scene NextScene, LoadSceneMode arg1)
+        {
+            switch (NextScene.buildIndex)
+            {
+                case 2:
+                    GetComponent<BattleManager>().StartBattle();
+                    return;
+
+                case 0:
+                    Destroy(
+                    FindObjectsOfType<GameManager>()[1].gameObject);
+                    return;
+
+                default:
+                    //ResetBattleManager
+                    break; 
+            }
         }
 
         public void ToBattleScene(EnemyPartyEntity Enemy, PlayerPartyEntity Player)

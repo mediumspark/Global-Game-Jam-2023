@@ -52,7 +52,7 @@ namespace Player
                 Collider[] col = Physics.OverlapSphere(transform.position, 1.0f, EnemyLayers);
                 BattleManager BM = GameManager.Singleton.GetComponent<BattleManager>(); 
                 OverWorldEnemy Enemy = col[0].GetComponent<OverWorldEnemy>();
-                BM.StartBattle(Enemy); 
+                BM.SetUpBattleData(Enemy); 
             }
 
         }

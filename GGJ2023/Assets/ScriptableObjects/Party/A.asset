@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3528835a35e46eb4b8c7f7bd3b6b4d6e, type: 3}
   m_Name: A
   m_EditorClassIdentifier: 
+  Model: {fileID: 919132149155446097, guid: 39e84a8252e74954c9faf3b0c9956dfc, type: 3}
   Attacks:
   - name: Finger Gun
     speed: 2

@@ -1,10 +1,11 @@
 ﻿using UnityEngine;
-using System.Linq; 
+using System.Linq;
+using Managers; 
 
 namespace Battle
 {
     [CreateAssetMenu(fileName = "new Battle Entity", menuName = "Battle Entity/PlayerParty/A")]
-    public class A : BattleEntity
+    public class A : BattleEntityScriptableObject
     {
         [System.Serializable]
         public class A_Basic : Attack
@@ -14,8 +15,9 @@ namespace Battle
                 this.name = name; 
             }
 
-            protected override void OnCast()
+            public override void OnCast(BattleEntityInstance target)
             {
+                Debug.Log("Attack 1");
             }
         }
 
@@ -27,8 +29,9 @@ namespace Battle
                 this.name = name;
             }
 
-            protected override void OnCast()
+            public override void OnCast(BattleEntityInstance target)
             {
+                Debug.Log("Attack 2");
             }
         }
 

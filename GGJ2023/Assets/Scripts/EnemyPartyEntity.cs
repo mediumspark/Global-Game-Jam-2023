@@ -7,6 +7,6 @@ namespace Battle
     [CreateAssetMenu(fileName ="new Battle Entity", menuName ="Battle Entity/Mob Party")]
     public class EnemyPartyEntity : ScriptableObject
     {
-        public List<BattleEntity> Party = new List<BattleEntity>();
+        public List<BattleEntityScriptableObject> Party = new List<BattleEntityScriptableObject>();
     }
 }

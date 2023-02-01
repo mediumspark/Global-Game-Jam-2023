@@ -7,5 +7,4 @@ namespace Player
     {
         public PlayerPartyEntity PlayerParty; 
     }
-
 }
