@@ -1,21 +1,21 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 
-public class A : PlayerUnit
+public class C : PlayerUnit
 {
-    public FingerBlast FB;
-    public HandGambit HG;
+    public WispFire WF;
+    public TheGrasp TG;
 
     protected override void Start()
     {
         base.Start();
-        FB = new FingerBlast(5, 4);
-        HG = new HandGambit(3, 3); 
+        WF = new WispFire(5, 4);
+        TG = new TheGrasp(3, 3);
     }
 
-    public class FingerBlast : BattleAction
+    public class WispFire : BattleAction
     {
-        public FingerBlast(int Speed, int Cooldown)
+        public WispFire(int Speed, int Cooldown)
         {
             this.Speed = Speed; CoolDown = Cooldown;
         }
@@ -26,9 +26,9 @@ public class A : PlayerUnit
         }
     }
 
-    public class HandGambit : BattleAction
+    public class TheGrasp : BattleAction
     {
-        public HandGambit(int Speed, int Cooldown)
+        public TheGrasp(int Speed, int Cooldown)
         {
             this.Speed = Speed; CoolDown = Cooldown;
         }
@@ -41,8 +41,8 @@ public class A : PlayerUnit
 
     public override void InstantiateAttackButtons()
     {
-        base.InstantiateAttackButtons(); 
-        
+        base.InstantiateAttackButtons();
+
     }
 
     public override void Special_1()
@@ -50,7 +50,7 @@ public class A : PlayerUnit
         if (Target != null)
         {
             BattleManager.Singleton.Attacks += () => Debug.Log($"{gameObject.name}'s turn");
-            BattleManager.Singleton.Attacks += () => FB.OnCast(Target, Lane);
+            BattleManager.Singleton.Attacks += () => WF.OnCast(Target, Lane);
             BattleManager.Singleton.NextActor();
             return;
         }
@@ -58,11 +58,12 @@ public class A : PlayerUnit
         base.Special_1();
     }
 
+    //AOE
     public override void Special_2()
     {
         base.Special_2();
         BattleManager.Singleton.Attacks += () => Debug.Log($"{gameObject.name}'s turn");
-        BattleManager.Singleton.Attacks += () => FB.OnCast(Target, Lane);
+        BattleManager.Singleton.Attacks += () => TG.OnCast(Target, Lane);
         BattleManager.Singleton.NextActor();
     }
 }

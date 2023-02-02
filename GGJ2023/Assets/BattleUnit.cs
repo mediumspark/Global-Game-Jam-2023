@@ -2,13 +2,12 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using TMPro; 
 public class BattleAction
 {
     public int Speed;
     public int CoolDown;
     public int Damage;
-    public bool Available; 
+   // public bool Available; 
 
     public BattleAction() { }
     public BattleAction(int Speed, int Cooldown, int Damage)
@@ -18,22 +17,36 @@ public class BattleAction
 
     public virtual void OnCast(BattleUnit target, Slider Lane)
     {
-        target.health -= Damage; 
+        BattleUnit ba = target; 
+    }
+
+    public void DealDamage(int Attack, BattleUnit target)
+    {
+        target.UnitStats.Health -= Attack;
+        if (!target.isAlive)
+        {
+            target.Die();
+        }
     }
 }
 
 public class BattleUnit : MonoBehaviour
 {
-    public int health;
-    public enum State { idle, acting, targeting }
-    public Seasons CurrentSeason;
+    public Stats UnitStats;
     [SerializeField]
-    public Slider SliderPrefab; 
+    public Slider SliderPrefab;
+    public Seasons CurrentSeason; 
     public Slider Lane;
-    public Button ButtonPrefab;
     public Track PlayTrack;
     public int PrimaryAttackSpeed, PrimaryAttackDamage;
-    PrimaryAttack Attack;
+    protected PrimaryAttack Attack;
+    public BattleUnit Target, TargetedBy; 
+    public bool isAlive => UnitStats.Health > 0; 
+
+    public void Die()
+    {
+        Destroy(gameObject); 
+    }
 
     public class PrimaryAttack : BattleAction
     {
@@ -46,16 +59,17 @@ public class BattleUnit : MonoBehaviour
         {
             base.OnCast(target, Lane);
             Lane.value = Lane.value + Speed < Lane.maxValue ? Lane.value + Speed : Lane.value + Speed - Lane.maxValue;
-            target.health -= Damage; 
+            DealDamage(Damage, target);
             Debug.Log($"Basic Attack is at {Speed} and has a cool down of {CoolDown} it will be attacking {target}"); 
         }
+
     }
 
     protected virtual void Start()
     {
         Attack = new PrimaryAttack(PrimaryAttackSpeed, 0, PrimaryAttackDamage);
         PlayTrack = BattleManager.Singleton.BattleTrack;
-        Lane = Instantiate(SliderPrefab, BattleManager.Singleton.TrackPanel.transform); 
+        Lane = Instantiate(SliderPrefab, BattleManager.Singleton.TrackPanel.transform);
     }
 
 
@@ -72,39 +86,6 @@ public class BattleUnit : MonoBehaviour
         BattleManager.Singleton.Attacks += () => Attack.OnCast(target, Lane); 
     }
 
-    public virtual void InstantiateAttackButtons()
-    {
-        var Attack = Instantiate(ButtonPrefab, BattleManager.Singleton.AttackTray.transform);
-        Attack.onClick.AddListener(BasicAttack);
-        Attack.GetComponentInChildren<TextMeshProUGUI>().text = "Basic Attack";
-
-        var SpecialAttack_1 = Instantiate(ButtonPrefab, BattleManager.Singleton.AttackTray.transform);
-        SpecialAttack_1.onClick.AddListener(Special_1);
-        SpecialAttack_1.GetComponentInChildren<TextMeshProUGUI>().text = "Special Attack 1";
-
-
-        var SpecialAttack_2 = Instantiate(ButtonPrefab, BattleManager.Singleton.AttackTray.transform);
-        SpecialAttack_2.onClick.AddListener(Special_2);
-        SpecialAttack_2.GetComponentInChildren<TextMeshProUGUI>().text = "Special Attack 2";
-
-        var Cheer = Instantiate(ButtonPrefab, BattleManager.Singleton.AttackTray.transform);
-        Cheer.onClick.AddListener(this.Cheer);
-        Cheer.GetComponentInChildren<TextMeshProUGUI>().text = "Cheer";
-    }
-
-    public virtual void BasicAttack()
-    {
-        if (BattleManager.Singleton.Target != null)
-        {
-            BattleManager.Singleton.Attacks += () => Debug.Log($"{name}'s turn");
-            BattleManager.Singleton.Attacks += () => Attack.OnCast(BattleManager.Singleton.Target, Lane);
-            BattleManager.Singleton.NextActor();
-            BattleManager.Singleton.Target = null;
-            return; 
-        }
-
-        Debug.Log("Target Required");
-    }
 
     public virtual void Special_1()
     {
@@ -124,7 +105,16 @@ public class BattleUnit : MonoBehaviour
     {
         if(BattleManager.Singleton.Actor != this)
         {
-            BattleManager.Singleton.Target = this; 
+            BattleManager.Singleton.Target = this;
+            TargetedBy = BattleManager.Singleton.Actor; 
+        }
+
+        if(BattleManager.Singleton.AttackQueued != null)
+        {
+            BattleManager.Singleton.Attacks += () => Debug.Log($"{BattleManager.Singleton.Actor.name}'s turn");
+            BattleManager.Singleton.Attacks += () => BattleManager.Singleton.AttackQueued.OnCast(Target, TargetedBy.Lane);
+            BattleManager.Singleton.NextActor();
+            return;
         }
 
         if(tag == "Player")

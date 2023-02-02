@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Managers; 
 
 public delegate void BattleQueue(); 
 public class BattleManager : MonoBehaviour
@@ -8,28 +9,50 @@ public class BattleManager : MonoBehaviour
     public static BattleManager Singleton; 
     public BattleQueue Attacks = null;
 
-    public BattleUnit Target, Actor;
+    public BattleUnit target; 
 
-    public List<BattleUnit> PlayerUnits;
+    public BattleUnit Target {
+        get 
+        { 
+            return target;
+        } 
+        set 
+        {
+            Actor.Target = value;
+            target = value; 
+        }
+    }
+    public PlayerUnit Actor;
+
+    public List<PlayerUnit> PlayerUnits;
     public List<BattleUnit> EnemyUnits;
     public Track BattleTrack;
     public GameObject TrackPanel;
     public GameObject BattleUI;
 
-    public GameObject AttackTray; 
+    public GameObject AttackTray;
 
-    int UnitIndex = 0; 
+    public BattleAction AttackQueued;
+    private int UnitIndex; 
+    private bool inBattle = false;
 
     private void Awake()
     {
-        Singleton = this;
-        Actor = PlayerUnits[UnitIndex];
-        ResetUnitTray(); 
+        if (!GetComponent<GameManager>())
+            OnBattleStarted(); 
     }
 
-    private void Update()
+    private void OnBattleStarted()
     {
-        Actor = PlayerUnits[UnitIndex];
+        Singleton = this;
+        Actor = PlayerUnits[0];
+        ResetUnitTray();
+        inBattle = true;
+    }
+
+    private void OnBattleExit()
+    {
+        inBattle = false; 
     }
 
     private void ClearUnitTray()
@@ -51,7 +74,9 @@ public class BattleManager : MonoBehaviour
 
     public void NextActor()
     {
-        UnitIndex = UnitIndex + 1 < PlayerUnits.Count ? UnitIndex + 1 : EnemyReadyUp();
+        UnitIndex = UnitIndex < PlayerUnits.Count - 1 ? UnitIndex + 1 : EnemyReadyUp();
+        Actor = PlayerUnits[UnitIndex]; 
+        AttackQueued = null;
         ResetUnitTray(); 
     }
 
@@ -75,4 +100,3 @@ public class BattleManager : MonoBehaviour
         Attacks = null; 
     }
 }
-public enum Seasons { }

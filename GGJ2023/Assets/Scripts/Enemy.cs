@@ -1,16 +1,15 @@
 ﻿using UnityEngine;
 using Managers;
 
-[SerializeField]
+[System.Serializable]
 public struct Stats
 {
-    public int Health, Speed, Defense, Attack; 
+    public int Health; 
 }
 
 namespace Interactables
 {
     public class OverWorldEnemy : MonoBehaviour
     {
-        public Stats EnemeyStates; 
     }
 }

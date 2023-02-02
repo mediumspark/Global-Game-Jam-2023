@@ -3,6 +3,20 @@ using UnityEngine;
 using UnityEngine.UI;
 using System.Linq;
 
+public enum Seasons
+{
+    Winter,
+    FoolsSpring,
+    SpringOfDeception,
+    ThirdWinter,
+    ThePollening,
+    Spring,
+    Summer,
+    Hell,
+    FalseFall,
+    SecondSummer,
+    Fall
+}
 public class Track : MonoBehaviour
 {
     public List<Slider> Lanes;
