@@ -1,10 +1,15 @@
 ﻿using UnityEngine;
-using Battle;
 //Player State Machine for the overworld character
 namespace Player
 {
     public class Party : MonoBehaviour
     {
-        public PlayerPartyEntity PlayerParty; 
+        public PartyMember PlayerParty; 
     }
+
+    public class PartyMember : MonoBehaviour
+    {
+
+    }
+
 }

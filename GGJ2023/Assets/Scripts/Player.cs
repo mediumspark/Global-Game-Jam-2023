@@ -5,12 +5,13 @@ using UnityEngine.InputSystem;
 using Interactables;
 using Managers; 
 
-//Player State Machine for the overworld character
+//Player State Machine for the character
 namespace Player
 {
     [RequireComponent(typeof(CharacterController))]
     public class Player : MonoBehaviour
     {
+        public Stats stats; 
         private PlayerControls PlayerControls;
         private bool _impared; 
         public bool IsImpared { get => _impared; set => _impared = value; }
@@ -50,11 +51,8 @@ namespace Player
             {
                 Debug.Log("Enemy, Battle Start");
                 Collider[] col = Physics.OverlapSphere(transform.position, 1.0f, EnemyLayers);
-                BattleManager BM = GameManager.Singleton.GetComponent<BattleManager>(); 
                 OverWorldEnemy Enemy = col[0].GetComponent<OverWorldEnemy>();
-                BM.SetUpBattleData(Enemy); 
             }
-
         }
 
         private void Interact_performed(InputAction.CallbackContext obj)

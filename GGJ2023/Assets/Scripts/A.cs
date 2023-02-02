@@ -1,54 +1,70 @@
 ﻿using UnityEngine;
-using System.Linq;
-using Managers; 
+using UnityEngine.UI;
 
-namespace Battle
+public class A : BattleUnit
 {
-    [CreateAssetMenu(fileName = "new Battle Entity", menuName = "Battle Entity/PlayerParty/A")]
-    public class A : BattleEntityScriptableObject
+    public FingerBlast FB;
+    public HandGambit HG;
+
+    protected override void Start()
     {
-        [System.Serializable]
-        public class A_Basic : Attack
-        {
-            public A_Basic(string name)
-            {
-                this.name = name; 
-            }
+        base.Start();
+        FB = new FingerBlast(5, 4);
+        HG = new HandGambit(3, 3); 
+    }
 
-            public override void OnCast(BattleEntityInstance target)
-            {
-                Debug.Log("Attack 1");
-            }
+    public class FingerBlast : BattleAction
+    {
+        public FingerBlast(int Speed, int Cooldown)
+        {
+            this.Speed = Speed; CoolDown = Cooldown;
         }
 
-        [System.Serializable]
-        public class A_Special_1 : Attack
+        public override void OnCast(BattleUnit target, Slider Lane)
         {
-            public A_Special_1(string name)
-            {
-                this.name = name;
-            }
+            base.OnCast(target, Lane);
+        }
+    }
 
-            public override void OnCast(BattleEntityInstance target)
-            {
-                Debug.Log("Attack 2");
-            }
+    public class HandGambit : BattleAction
+    {
+        public HandGambit(int Speed, int Cooldown)
+        {
+            this.Speed = Speed; CoolDown = Cooldown;
         }
 
-        private void OnValidate()
+        public override void OnCast(BattleUnit target, Slider Lane)
         {
-            for(int i = 0; i < Attacks.Count(); i++)
-            {
-                string it = Attacks[i].name;
+            base.OnCast(target, Lane);
+        }
+    }
 
-                if (it == "Finger Gun" ||
-                    it == "Hand Gambit")
-                    return; 
-            }
+    public override void InstantiateAttackButtons()
+    {
+        base.InstantiateAttackButtons(); 
+        
+    }
 
-            Attacks.Add(new A_Basic("Finger Gun")); 
-            Attacks.Add(new A_Special_1("Hand Gambit")); 
+    public override void Special_1()
+    {
+        if (BattleManager.Singleton.Target != null)
+        {
+            BattleManager.Singleton.Attacks += () => Debug.Log($"{name}'s turn");
+            BattleManager.Singleton.Attacks += () => FB.OnCast(BattleManager.Singleton.Target, Lane);
+            BattleManager.Singleton.NextActor();
+            BattleManager.Singleton.Target = null;
+            return;
         }
 
+        base.Special_1();
+    }
+
+    public override void Special_2()
+    {
+        base.Special_2();
+        BattleManager.Singleton.Attacks += () => Debug.Log($"{name}'s turn");
+        BattleManager.Singleton.Attacks += () => FB.OnCast(BattleManager.Singleton.Target, Lane);
+        BattleManager.Singleton.NextActor();
+        BattleManager.Singleton.Target = null;
     }
 }
