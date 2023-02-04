@@ -1,13 +1,14 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Managers; 
+using Managers;
+using System.Linq; 
 
-public delegate void BattleQueue(); 
 public class BattleManager : MonoBehaviour
 {
-    public static BattleManager Singleton; 
-    public BattleQueue Attacks = null;
+    public static BattleManager Singleton;
+    public GameObject BattleUI;
+    public PlayerCanvas PlayerUI; 
 
     public BattleUnit target; 
 
@@ -28,31 +29,34 @@ public class BattleManager : MonoBehaviour
     public List<BattleUnit> EnemyUnits;
     public Track BattleTrack;
     public GameObject TrackPanel;
-    public GameObject BattleUI;
 
     public GameObject AttackTray;
 
-    public BattleAction AttackQueued;
     private int UnitIndex; 
     private bool inBattle = false;
 
     private void Awake()
     {
-        if (!GetComponent<GameManager>())
-            OnBattleStarted(); 
+        Singleton = this; 
     }
 
-    private void OnBattleStarted()
+    public void OnBattleStarted()
     {
-        Singleton = this;
+        PlayerUI.Units[0] = PlayerUnits[0];
+        PlayerUI.Units[1] = PlayerUnits[1];
+        PlayerUI.Units[2] = PlayerUnits[2];
+
+        BattleUI.SetActive(true); 
         Actor = PlayerUnits[0];
         ResetUnitTray();
         inBattle = true;
+        PlayerUI.gameObject.SetActive(true); 
     }
 
-    private void OnBattleExit()
+    public void OnBattleExit()
     {
-        inBattle = false; 
+        inBattle = false;
+        BattleUI.SetActive(false); 
     }
 
     private void ClearUnitTray()
@@ -76,7 +80,7 @@ public class BattleManager : MonoBehaviour
     {
         UnitIndex = UnitIndex < PlayerUnits.Count - 1 ? UnitIndex + 1 : EnemyReadyUp();
         Actor = PlayerUnits[UnitIndex]; 
-        AttackQueued = null;
+        //AttackQueued = null;
         ResetUnitTray(); 
     }
 
@@ -87,16 +91,35 @@ public class BattleManager : MonoBehaviour
         for (int i = 0; i < EnemyUnits.Count; i++)
             EnemyUnits[i].AIAttack(PlayerUnits[0]);
 
-        Attacks += () => BattleUI.SetActive(true); 
 
-        InvokeBattleQueue(); 
+        InvokeBattleQueue();
+        
+        BattleUI.SetActive(true);
 
         return 0; 
     }
-
     public void InvokeBattleQueue()
     {
-        Attacks.Invoke();
-        Attacks = null; 
+        List<BattleUnit> AllLivingUnits = new List<BattleUnit>();
+        AllLivingUnits.AddRange(EnemyUnits);
+        AllLivingUnits.AddRange(PlayerUnits);
+        AllLivingUnits.OrderBy(ctx => BattleTrack.Rank(ctx.Lane));
+
+        foreach(BattleUnit unit in AllLivingUnits)
+        {
+            Debug.Log($"{unit} is attacking {unit.Target} with {unit.AttackQueued}");
+            unit.Act(); 
+        }
+
+        //ActionQueue = null; 
     }
+
+#if UNITY_EDITOR
+    private void OnDrawGizmos()
+    {
+        Gizmos.color = Color.cyan; 
+        for (int i = 0; i < 6; i++)
+            Gizmos.DrawWireSphere(transform.GetChild(i).position, 0.5f); 
+    }
+#endif
 }

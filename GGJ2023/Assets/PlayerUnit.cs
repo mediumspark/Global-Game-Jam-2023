@@ -1,21 +1,22 @@
 ﻿using UnityEngine.UI;
 using TMPro;
-using UnityEngine; 
+using UnityEngine;
+using UnityEngine.EventSystems; 
 
 public class PlayerUnit : BattleUnit
 {
     public Button ButtonPrefab;
+    public Sprite Portrait;
     public virtual void BasicAttack()
     {
-        if (Target != null)
+        if (Target != null && AttackQueued != null)
         {
-            BattleManager.Singleton.Attacks += () => Debug.Log($"{name}'s turn");
-            BattleManager.Singleton.Attacks += () => Attack.OnCast(Target, Lane);
-            BattleManager.Singleton.NextActor();
+            //BattleManager.Singleton.ActionQueue += () => Debug.Log($"{name}'s turn");
+            CommitBattleAction(Attack);
             return;
         }
 
-        BattleManager.Singleton.AttackQueued = Attack; 
+        AttackQueued = Attack; 
 
         Debug.Log("Attack Queued");
     }

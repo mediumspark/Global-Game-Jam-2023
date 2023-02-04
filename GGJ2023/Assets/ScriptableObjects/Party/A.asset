@@ -9,14 +9,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3528835a35e46eb4b8c7f7bd3b6b4d6e, type: 3}
+  m_Script: {fileID: 11500000, guid: 166a39811ac905d42a4932ff706e88af, type: 3}
   m_Name: A
   m_EditorClassIdentifier: 
-  Model: {fileID: 919132149155446097, guid: 39e84a8252e74954c9faf3b0c9956dfc, type: 3}
-  Attacks:
-  - name: Finger Gun
-    speed: 2
-    Icon: {fileID: 0}
-  - name: Hand Gambit
-    speed: 4
-    Icon: {fileID: 0}
+  BattleUnit: {fileID: 1049190804182977169, guid: 8b1ae45b6d64d674a85828074d096d19,
+    type: 3}
+  UnitStatsCarryOver:
+    Health: 0

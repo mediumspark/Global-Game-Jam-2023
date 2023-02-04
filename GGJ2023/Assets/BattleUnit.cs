@@ -2,12 +2,16 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using Managers;
+
 public class BattleAction
 {
     public int Speed;
     public int CoolDown;
     public int Damage;
-   // public bool Available; 
+    // public bool Available; 
+    public delegate void CastDelegate(BattleUnit target, Slider Lane);
+    public CastDelegate OnCast; 
 
     public BattleAction() { }
     public BattleAction(int Speed, int Cooldown, int Damage)
@@ -15,9 +19,8 @@ public class BattleAction
         this.Speed = Speed; CoolDown = Cooldown; 
     }
 
-    public virtual void OnCast(BattleUnit target, Slider Lane)
+    public virtual void CreateCast(BattleUnit target, Slider Lane)
     {
-        BattleUnit ba = target; 
     }
 
     public void DealDamage(int Attack, BattleUnit target)
@@ -35,7 +38,8 @@ public class BattleUnit : MonoBehaviour
     public Stats UnitStats;
     [SerializeField]
     public Slider SliderPrefab;
-    public Seasons CurrentSeason; 
+    public Seasons CurrentSeason;
+    public BattleAction AttackQueued = null;
     public Slider Lane;
     public Track PlayTrack;
     public int PrimaryAttackSpeed, PrimaryAttackDamage;
@@ -45,7 +49,26 @@ public class BattleUnit : MonoBehaviour
 
     public void Die()
     {
-        Destroy(gameObject); 
+        //Tempt
+        if (tag == "Player")
+        {
+            BattleManager.Singleton.PlayerUnits.Remove(this as PlayerUnit);
+        }
+        if (tag == "Enemy")
+        {
+            BattleManager.Singleton.EnemyUnits.Remove(this);
+        }
+
+        Destroy(gameObject);
+    }
+
+    private void OnDestroy()
+    {
+        if (BattleManager.Singleton.PlayerUnits.Count == 0 ||
+            BattleManager.Singleton.EnemyUnits.Count == 0)
+        {
+            GameManager.Singleton.OverWorld();
+        }
     }
 
     public class PrimaryAttack : BattleAction
@@ -55,12 +78,17 @@ public class BattleUnit : MonoBehaviour
             this.Speed = Speed; CoolDown = Cooldown; this.Damage = Damage; 
         }
 
-        public override void OnCast(BattleUnit target, Slider Lane)
+        public override void CreateCast(BattleUnit target, Slider Lane)
         {
-            base.OnCast(target, Lane);
+            base.CreateCast(target, Lane);
+            OnCast += BasicStrike; 
+        }
+
+        protected void BasicStrike(BattleUnit target, Slider Lane)
+        {
             Lane.value = Lane.value + Speed < Lane.maxValue ? Lane.value + Speed : Lane.value + Speed - Lane.maxValue;
             DealDamage(Damage, target);
-            Debug.Log($"Basic Attack is at {Speed} and has a cool down of {CoolDown} it will be attacking {target}"); 
+          //  Debug.Log($"Basic Attack is at {Speed} and has a cool down of {CoolDown} it will be attacking {target}");
         }
 
     }
@@ -83,9 +111,17 @@ public class BattleUnit : MonoBehaviour
 
     public virtual void AIAttack(BattleUnit target)
     {
-        BattleManager.Singleton.Attacks += () => Attack.OnCast(target, Lane); 
+        Target = target; 
+        Attack.CreateCast(target, Lane);
+        AttackQueued = Attack; 
     }
 
+    protected void CommitBattleAction(BattleAction action)
+    {
+        action.CreateCast(Target, Lane);
+        AttackQueued = action;
+        BattleManager.Singleton.NextActor();
+    }
 
     public virtual void Special_1()
     {
@@ -101,30 +137,40 @@ public class BattleUnit : MonoBehaviour
         Debug.Log("Cheer");
     }
 
-    private void OnMouseDown()
+    public void Act()
     {
-        if(BattleManager.Singleton.Actor != this)
+        AttackQueued.OnCast.Invoke(Target, Lane); 
+    }
+
+    public void OnSelect()
+    {
+        if (BattleManager.Singleton.Actor != this)
         {
             BattleManager.Singleton.Target = this;
-            TargetedBy = BattleManager.Singleton.Actor; 
+            TargetedBy = BattleManager.Singleton.Actor;
         }
 
-        if(BattleManager.Singleton.AttackQueued != null)
+        if (BattleManager.Singleton.Actor.AttackQueued != null)
         {
-            BattleManager.Singleton.Attacks += () => Debug.Log($"{BattleManager.Singleton.Actor.name}'s turn");
-            BattleManager.Singleton.Attacks += () => BattleManager.Singleton.AttackQueued.OnCast(Target, TargetedBy.Lane);
+            // BattleManager.Singleton.ActionQueue += () => Debug.Log($"{BattleManager.Singleton.Actor.name}'s turn");
+            BattleManager.Singleton.Actor.AttackQueued.CreateCast(this, TargetedBy.Lane);
             BattleManager.Singleton.NextActor();
             return;
         }
 
-        if(tag == "Player")
+        if (tag == "Player")
         {
             Debug.Log("I'm a friend");
         }
 
-        if(tag == "Enemy")
+        if (tag == "Enemy")
         {
             Debug.Log("I'm a foe");
         }
+    }
+
+    private void OnMouseDown()
+    {
+        OnSelect(); 
     }
 }

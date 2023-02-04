@@ -9,14 +9,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 20b90c5245e3079458e69c3aa761356c, type: 3}
+  m_Script: {fileID: 11500000, guid: 166a39811ac905d42a4932ff706e88af, type: 3}
   m_Name: B
   m_EditorClassIdentifier: 
-  Model: {fileID: 919132149155446097, guid: f52c161c0f60786409d205319673ab67, type: 3}
-  Attacks:
-  - name: Lil Bolt
-    speed: 25
-    Icon: {fileID: 0}
-  - name: Chain Shock
-    speed: 5
-    Icon: {fileID: 0}
+  BattleUnit: {fileID: 3424703102149285748, guid: 4651e5609e0ce6048a9237caae70c60f,
+    type: 3}
+  UnitStatsCarryOver:
+    Health: 0

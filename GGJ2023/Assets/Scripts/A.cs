@@ -5,7 +5,6 @@ public class A : PlayerUnit
 {
     public FingerBlast FB;
     public HandGambit HG;
-
     protected override void Start()
     {
         base.Start();
@@ -20,9 +19,9 @@ public class A : PlayerUnit
             this.Speed = Speed; CoolDown = Cooldown;
         }
 
-        public override void OnCast(BattleUnit target, Slider Lane)
+        public override void CreateCast(BattleUnit target, Slider Lane)
         {
-            base.OnCast(target, Lane);
+            base.CreateCast(target, Lane);
         }
     }
 
@@ -33,9 +32,9 @@ public class A : PlayerUnit
             this.Speed = Speed; CoolDown = Cooldown;
         }
 
-        public override void OnCast(BattleUnit target, Slider Lane)
+        public override void CreateCast(BattleUnit target, Slider Lane)
         {
-            base.OnCast(target, Lane);
+            base.CreateCast(target, Lane);
         }
     }
 
@@ -47,12 +46,10 @@ public class A : PlayerUnit
 
     public override void Special_1()
     {
-        if (Target != null)
+        if (Target != null && AttackQueued != null)
         {
-            BattleManager.Singleton.Attacks += () => Debug.Log($"{gameObject.name}'s turn");
-            BattleManager.Singleton.Attacks += () => FB.OnCast(Target, Lane);
-            BattleManager.Singleton.NextActor();
-            return;
+            //BattleManager.Singleton.ActionQueue += () => Debug.Log($"{gameObject.name}'s turn");
+            CommitBattleAction(FB);
         }
 
         base.Special_1();
@@ -61,8 +58,7 @@ public class A : PlayerUnit
     public override void Special_2()
     {
         base.Special_2();
-        BattleManager.Singleton.Attacks += () => Debug.Log($"{gameObject.name}'s turn");
-        BattleManager.Singleton.Attacks += () => FB.OnCast(Target, Lane);
-        BattleManager.Singleton.NextActor();
+        //BattleManager.Singleton.ActionQueue += () => Debug.Log($"{gameObject.name}'s turn");
+        CommitBattleAction(HG);
     }
 }

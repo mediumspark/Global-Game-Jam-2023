@@ -20,9 +20,9 @@ public class C : PlayerUnit
             this.Speed = Speed; CoolDown = Cooldown;
         }
 
-        public override void OnCast(BattleUnit target, Slider Lane)
+        public override void CreateCast(BattleUnit target, Slider Lane)
         {
-            base.OnCast(target, Lane);
+            base.CreateCast(target, Lane);
         }
     }
 
@@ -33,25 +33,23 @@ public class C : PlayerUnit
             this.Speed = Speed; CoolDown = Cooldown;
         }
 
-        public override void OnCast(BattleUnit target, Slider Lane)
+        public override void CreateCast(BattleUnit target, Slider Lane)
         {
-            base.OnCast(target, Lane);
+            base.CreateCast(target, Lane);
         }
     }
 
     public override void InstantiateAttackButtons()
     {
         base.InstantiateAttackButtons();
-
     }
 
     public override void Special_1()
     {
-        if (Target != null)
+        if (Target != null && AttackQueued != null)
         {
-            BattleManager.Singleton.Attacks += () => Debug.Log($"{gameObject.name}'s turn");
-            BattleManager.Singleton.Attacks += () => WF.OnCast(Target, Lane);
-            BattleManager.Singleton.NextActor();
+            //BattleManager.Singleton.ActionQueue += () => Debug.Log($"{gameObject.name}'s turn");
+            CommitBattleAction(WF);
             return;
         }
 
@@ -62,8 +60,7 @@ public class C : PlayerUnit
     public override void Special_2()
     {
         base.Special_2();
-        BattleManager.Singleton.Attacks += () => Debug.Log($"{gameObject.name}'s turn");
-        BattleManager.Singleton.Attacks += () => TG.OnCast(Target, Lane);
-        BattleManager.Singleton.NextActor();
+        //BattleManager.Singleton.ActionQueue += () => Debug.Log($"{gameObject.name}'s turn");
+        CommitBattleAction(TG);
     }
 }

@@ -31,7 +31,57 @@ public class Track : MonoBehaviour
 
     private void Start()
     {
-        
+        int season = Random.Range(0, 11);
+        CurrentSeason = (Seasons)season;
+        SeasonStart = Random.Range(0, 600);
+        SeasonEnd = Random.Range(0, 50); 
+
+        switch (CurrentSeason)
+        {
+            case Seasons.Winter:
+                SeasonHandle.GetComponent<Image>().color = Color.white;
+                break;
+
+            case Seasons.FoolsSpring:
+                SeasonHandle.GetComponent<Image>().color = new Color(.1f, 0.5f, 0, 1);
+                break;
+
+            case Seasons.SpringOfDeception:
+                SeasonHandle.GetComponent<Image>().color = new Color(.3f, 0.1f, 0, 1);
+                break;
+
+            case Seasons.ThirdWinter:
+                SeasonHandle.GetComponent<Image>().color = Color.gray;
+                break;
+
+            case Seasons.ThePollening:
+                SeasonHandle.GetComponent<Image>().color = Color.magenta;
+                break; 
+
+            case Seasons.Spring:
+                SeasonHandle.GetComponent<Image>().color = Color.green;
+                break;
+
+            case Seasons.Summer:
+                SeasonHandle.GetComponent<Image>().color = Color.yellow;
+                break;
+
+            case Seasons.Hell:
+                SeasonHandle.GetComponent<Image>().color = Color.red;
+                break;
+
+            case Seasons.FalseFall:
+                SeasonHandle.GetComponent<Image>().color = Color.cyan;
+                break;
+
+            case Seasons.SecondSummer:
+                SeasonHandle.GetComponent<Image>().color = new Color(1, 1, 0, .5f);
+                break;
+
+            case Seasons.Fall:
+                SeasonHandle.GetComponent<Image>().color = new Color(1, 0.64f, 0); 
+                break;
+        }
     }
 
     private void Update()
