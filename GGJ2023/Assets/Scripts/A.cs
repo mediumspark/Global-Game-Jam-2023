@@ -5,11 +5,14 @@ public class A : PlayerUnit
 {
     public FingerBlast FB;
     public HandGambit HG;
+    public ACheer ACheering; 
     protected override void Start()
     {
         base.Start();
-        FB = new FingerBlast(5, 4);
-        HG = new HandGambit(3, 3); 
+        name = "A"; 
+        FB = new FingerBlast(15 + Mathf.RoundToInt(15 * SpeedMod), 4);
+        HG = new HandGambit(13 + Mathf.RoundToInt(15 * SpeedMod), 3);
+        ACheering = new ACheer(); 
     }
 
     public class FingerBlast : BattleAction
@@ -21,7 +24,14 @@ public class A : PlayerUnit
 
         public override void CreateCast(BattleUnit target, Slider Lane)
         {
-            base.CreateCast(target, Lane);
+            OnCast += AttackDamage;
+        }
+
+        private void AttackDamage(BattleUnit target, Slider Lane)
+        {
+            var A = FindObjectOfType<A>();
+            DealDamage(1, A);
+            DealDamage(15, target);
         }
     }
 
@@ -34,7 +44,31 @@ public class A : PlayerUnit
 
         public override void CreateCast(BattleUnit target, Slider Lane)
         {
-            base.CreateCast(target, Lane);
+            OnCast += AttackDamage; 
+        }
+
+        private void AttackDamage(BattleUnit target, Slider Lane)
+        {
+            var A = FindObjectOfType<A>();
+            DealDamage(10, A);
+            foreach(var Units in BattleManager.Singleton.EnemyUnits)
+            {
+                DealDamage(10, Units);
+            }
+        }
+    }
+
+    public class ACheer: BattleAction
+    {
+        public override void CreateCast(BattleUnit target, Slider Lane)
+        {
+            OnCast += Cheer;
+        }
+
+        private void Cheer(BattleUnit target, Slider slider)
+        {
+            var B = FindObjectOfType<B>().AttackMod += 1.5f;
+            var C = FindObjectOfType<C>().AttackMod += 1.5f;
         }
     }
 
@@ -60,5 +94,11 @@ public class A : PlayerUnit
         base.Special_2();
         //BattleManager.Singleton.ActionQueue += () => Debug.Log($"{gameObject.name}'s turn");
         CommitBattleAction(HG);
+    }
+
+    public override void Cheer()
+    {
+        base.Cheer();
+        CommitBattleAction(ACheering);
     }
 }

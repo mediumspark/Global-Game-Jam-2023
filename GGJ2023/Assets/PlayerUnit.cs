@@ -7,36 +7,50 @@ public class PlayerUnit : BattleUnit
 {
     public Button ButtonPrefab;
     public Sprite Portrait;
+
+    protected override void Start()
+    {
+        base.Start();
+        Lane.handleRect.GetComponent<Image>().sprite = Portrait; 
+    }
     public virtual void BasicAttack()
     {
         if (Target != null && AttackQueued != null)
         {
-            //BattleManager.Singleton.ActionQueue += () => Debug.Log($"{name}'s turn");
             CommitBattleAction(Attack);
             return;
         }
 
         AttackQueued = Attack; 
+    }
 
-        Debug.Log("Attack Queued");
+    private void AddButtonListeners(Button Button, string Text, UnityEngine.Events.UnityAction call)
+    {
+        Button.onClick.AddListener(call);
+
+        if (Target == null)
+        {
+            Button.onClick.AddListener(() => { 
+                BattleManager.Singleton.TargetText.text = "Choose a target";
+            });
+        }
+
+        Button.GetComponentInChildren<TextMeshProUGUI>().text = Text;
+
     }
     public virtual void InstantiateAttackButtons()
     {
         var Attack = Instantiate(ButtonPrefab, BattleManager.Singleton.AttackTray.transform);
-        Attack.onClick.AddListener(BasicAttack);
-        Attack.GetComponentInChildren<TextMeshProUGUI>().text = "Basic Attack";
+        AddButtonListeners(Attack, "Basic Attack", BasicAttack); 
 
         var SpecialAttack_1 = Instantiate(ButtonPrefab, BattleManager.Singleton.AttackTray.transform);
-        SpecialAttack_1.onClick.AddListener(Special_1);
-        SpecialAttack_1.GetComponentInChildren<TextMeshProUGUI>().text = "Special Attack 1";
-
+        AddButtonListeners(SpecialAttack_1, "Special Attack 1", Special_1);
 
         var SpecialAttack_2 = Instantiate(ButtonPrefab, BattleManager.Singleton.AttackTray.transform);
-        SpecialAttack_2.onClick.AddListener(Special_2);
-        SpecialAttack_2.GetComponentInChildren<TextMeshProUGUI>().text = "Special Attack 2";
+        AddButtonListeners(SpecialAttack_2, "Special Attack 2", Special_2);
 
-        var Cheer = Instantiate(ButtonPrefab, BattleManager.Singleton.AttackTray.transform);
-        Cheer.onClick.AddListener(this.Cheer);
-        Cheer.GetComponentInChildren<TextMeshProUGUI>().text = "Cheer";
+        var OnCheer = Instantiate(ButtonPrefab, BattleManager.Singleton.AttackTray.transform);
+        OnCheer.onClick.AddListener(Cheer);
+        OnCheer.GetComponentInChildren<TextMeshProUGUI>().text = "Cheer";
     }
 }

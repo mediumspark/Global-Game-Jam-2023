@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using Interactables;
 using Managers;
+using System.Linq; 
 
 //Player State Machine for the character
 namespace Player
@@ -63,9 +64,10 @@ namespace Player
         {
             if(Physics.CheckSphere(transform.position, 1.0f, EnemyLayers))
             {
-                Debug.Log("Enemy, Battle Start");
+               // Debug.Log("Enemy, Battle Start");
                 Collider[] col = Physics.OverlapSphere(transform.position, 1.0f, EnemyLayers);
                 OverworldEnemy Enemy = col[0].GetComponent<OverworldEnemy>();
+                GameManager.Singleton.OWEnemyID = FindObjectsOfType<OverworldEnemy>().ToList().IndexOf(Enemy);
                 GameManager.Singleton.GetComponent<Party>().EnemyParty = Enemy.Party;
                 GameManager.Singleton.LoadBattleLevel();
             }

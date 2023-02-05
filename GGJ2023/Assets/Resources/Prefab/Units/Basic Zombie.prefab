@@ -61,16 +61,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   UnitStats:
-    Health: 50
+    maxHealth: 25
+    health: 25
   SliderPrefab: {fileID: 5988301787276131444, guid: e20d7358217da6841a9d8da8862b67df,
     type: 3}
   CurrentSeason: 0
   Lane: {fileID: 0}
   PlayTrack: {fileID: 0}
-  PrimaryAttackSpeed: 0
-  PrimaryAttackDamage: 0
+  PrimaryAttackSpeed: 3
+  PrimaryAttackDamage: 5
   Target: {fileID: 0}
   TargetedBy: {fileID: 0}
+  SpeedMod: 0
+  AttackMod: 0
 --- !u!1001 &3511414782642802915
 PrefabInstance:
   m_ObjectHideFlags: 0

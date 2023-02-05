@@ -5,12 +5,15 @@ public class B : PlayerUnit
 {
     public LilShock LS;
     public BigBolt BB;
+    public BCheer cheer;
 
     protected override void Start()
     {
         base.Start();
+        name = "B"; 
         LS = new LilShock(5, 4);
         BB = new BigBolt(3, 3);
+        cheer = new BCheer(); 
     }
 
     public class LilShock : BattleAction
@@ -39,6 +42,21 @@ public class B : PlayerUnit
         }
     }
 
+    public class BCheer : BattleAction
+    {
+        public override void CreateCast(BattleUnit target, Slider Lane)
+        {
+            OnCast += Cheer; 
+
+        }
+
+        public void Cheer (BattleUnit target, Slider Lane)
+        {
+            FindObjectOfType<C>().SpeedMod += 1.5f;
+            FindObjectOfType<A>().SpeedMod += 1.5f;
+        }
+    }
+
     public override void InstantiateAttackButtons()
     {
         base.InstantiateAttackButtons();
@@ -63,5 +81,11 @@ public class B : PlayerUnit
         base.Special_2();
         // BattleManager.Singleton.ActionQueue += () => Debug.Log($"{gameObject.name}'s turn");
         CommitBattleAction(BB);
+    }
+
+    public override void Cheer()
+    {
+        base.Cheer();
+        CommitBattleAction(cheer); 
     }
 }

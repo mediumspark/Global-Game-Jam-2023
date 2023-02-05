@@ -2,7 +2,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Managers;
-using System.Linq; 
+using System.Linq;
+using UnityEngine.Pool;
+using TMPro;
 
 public class BattleManager : MonoBehaviour
 {
@@ -10,8 +12,9 @@ public class BattleManager : MonoBehaviour
     public GameObject BattleUI;
     public PlayerCanvas PlayerUI; 
 
-    public BattleUnit target; 
-
+    public BattleUnit target;
+    public TextMeshProUGUI CurrentActorText; 
+    public TextMeshProUGUI TargetText; 
     public BattleUnit Target {
         get 
         { 
@@ -35,6 +38,8 @@ public class BattleManager : MonoBehaviour
     private int UnitIndex; 
     private bool inBattle = false;
 
+    public ObjectPool<TextMeshProUGUI> TextPool;
+
     private void Awake()
     {
         Singleton = this; 
@@ -50,13 +55,24 @@ public class BattleManager : MonoBehaviour
         Actor = PlayerUnits[0];
         ResetUnitTray();
         inBattle = true;
-        PlayerUI.gameObject.SetActive(true); 
+        PlayerUI.gameObject.SetActive(true);
+    }
+
+    private void Update()
+    {
+        CurrentActorText.text = $"{Actor}";
     }
 
     public void OnBattleExit()
     {
+        PlayerUnits.Clear();
+        for (int i = 0; i < TrackPanel.transform.childCount; i++)
+            Destroy(TrackPanel.transform.GetChild(i).gameObject);
+
         inBattle = false;
-        BattleUI.SetActive(false); 
+        BattleUI.SetActive(false);
+        PlayerUI.gameObject.SetActive(false);
+        GetComponent<LevelManager>().DefeatedEnemiesInLevel.Add(GameManager.Singleton.OWEnemyID);
     }
 
     private void ClearUnitTray()
@@ -79,9 +95,10 @@ public class BattleManager : MonoBehaviour
     public void NextActor()
     {
         UnitIndex = UnitIndex < PlayerUnits.Count - 1 ? UnitIndex + 1 : EnemyReadyUp();
-        Actor = PlayerUnits[UnitIndex]; 
+        Actor = PlayerUnits[UnitIndex];
+        TargetText.text = ""; 
         //AttackQueued = null;
-        ResetUnitTray(); 
+        ResetUnitTray();
     }
 
     public int EnemyReadyUp()
@@ -89,8 +106,7 @@ public class BattleManager : MonoBehaviour
         BattleUI.SetActive(false);
 
         for (int i = 0; i < EnemyUnits.Count; i++)
-            EnemyUnits[i].AIAttack(PlayerUnits[0]);
-
+            EnemyUnits[i].AIAttack(PlayerUnits[Random.Range(0, 3)]);
 
         InvokeBattleQueue();
         
@@ -107,10 +123,10 @@ public class BattleManager : MonoBehaviour
 
         foreach(BattleUnit unit in AllLivingUnits)
         {
-            Debug.Log($"{unit} is attacking {unit.Target} with {unit.AttackQueued}");
+         //   Debug.Log($"{unit} is attacking {unit.Target} with {unit.AttackQueued}");
             unit.Act(); 
         }
-
+        
         //ActionQueue = null; 
     }
 

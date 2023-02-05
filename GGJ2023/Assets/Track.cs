@@ -34,8 +34,7 @@ public class Track : MonoBehaviour
         int season = Random.Range(0, 11);
         CurrentSeason = (Seasons)season;
         SeasonStart = Random.Range(0, 600);
-        SeasonEnd = Random.Range(0, 50); 
-
+        SeasonEnd = Random.Range(0, 25);
         switch (CurrentSeason)
         {
             case Seasons.Winter:
@@ -92,6 +91,55 @@ public class Track : MonoBehaviour
         if(SeasonEnd > 0 && SeasonEnd < 50)
         {
             SeasonHandle.sizeDelta = new Vector2(SeasonEnd * 10, 0); 
+        }
+
+        var AllUnits = FindObjectsOfType<BattleUnit>();
+        foreach (var battleUnit in AllUnits)
+        {
+            if (isInSeasonTerritory(battleUnit.Lane))
+            {
+                switch (CurrentSeason)
+                {
+                    case Seasons.Winter:
+
+                        battleUnit.SpeedMod -= 0.5f;
+                        break;
+
+                    case Seasons.FoolsSpring:
+                        break;
+
+                    case Seasons.SpringOfDeception:
+                        break;
+
+                    case Seasons.ThirdWinter:
+                        battleUnit.SpeedMod -= 0.25f;
+                        battleUnit.Lane.onValueChanged.AddListener(ctx => battleUnit.AttackQueued.DealDamage(2, battleUnit));
+                        break;
+
+                    case Seasons.ThePollening:
+                        battleUnit.Lane.onValueChanged.AddListener(ctx => battleUnit.AttackQueued.DealDamage(9, battleUnit));
+                        break;
+
+                    case Seasons.Spring:
+                        break;
+
+                    case Seasons.Summer:
+                        break;
+
+                    case Seasons.Hell:
+                        battleUnit.Lane.onValueChanged.AddListener(ctx => battleUnit.AttackQueued.DealDamage(12, battleUnit));
+                        break;
+
+                    case Seasons.FalseFall:
+                        break;
+
+                    case Seasons.SecondSummer:
+                        break;
+
+                    case Seasons.Fall:
+                        break;
+                }
+            }
         }
     }
 

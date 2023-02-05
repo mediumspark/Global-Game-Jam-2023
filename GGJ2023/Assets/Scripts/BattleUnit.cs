@@ -3,12 +3,15 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using Managers;
+using TMPro;
 
 public class BattleAction
 {
     public int Speed;
     public int CoolDown;
     public int Damage;
+    public TextMeshProUGUI TextPrefab;
+
     // public bool Available; 
     public delegate void CastDelegate(BattleUnit target, Slider Lane);
     public CastDelegate OnCast; 
@@ -25,7 +28,24 @@ public class BattleAction
 
     public void DealDamage(int Attack, BattleUnit target)
     {
+        PlayerCanvas PC = GameObject.FindObjectOfType<PlayerCanvas>();
+        TextPrefab = Resources.Load<TextMeshProUGUI>("Prefab/UI/Text (TMP)");
+        TextMeshProUGUI DamageText;
+
+        if (target is PlayerUnit)
+        {
+            DamageText = GameObject.Instantiate(TextPrefab,
+                PC.PlayerPortraitPanel(target));
+            DamageText.rectTransform.anchoredPosition = new Vector3(0, 178);
+        }
+        else {
+            DamageText = GameObject.Instantiate(TextPrefab, PC.transform);
+            DamageText.rectTransform.anchoredPosition = 
+                Camera.main.WorldToViewportPoint(target.transform.position + Vector3.up * 200);
+        }
+        target.StartCoroutine(DamageText.GetComponent<DamageText>().AssignAndMove($"{Attack}"));
         target.UnitStats.Health -= Attack;
+
         if (!target.isAlive)
         {
             target.Die();
@@ -44,7 +64,8 @@ public class BattleUnit : MonoBehaviour
     public Track PlayTrack;
     public int PrimaryAttackSpeed, PrimaryAttackDamage;
     protected PrimaryAttack Attack;
-    public BattleUnit Target, TargetedBy; 
+    public BattleUnit Target, TargetedBy;
+    public float SpeedMod, AttackMod; 
     public bool isAlive => UnitStats.Health > 0; 
 
     public void Die()
@@ -67,6 +88,7 @@ public class BattleUnit : MonoBehaviour
         if (BattleManager.Singleton.PlayerUnits.Count == 0 ||
             BattleManager.Singleton.EnemyUnits.Count == 0)
         {
+            BattleManager.Singleton.OnBattleExit(); 
             GameManager.Singleton.OverWorld();
         }
     }
@@ -116,7 +138,7 @@ public class BattleUnit : MonoBehaviour
         AttackQueued = Attack; 
     }
 
-    protected void CommitBattleAction(BattleAction action)
+    public void CommitBattleAction(BattleAction action)
     {
         action.CreateCast(Target, Lane);
         AttackQueued = action;
@@ -125,21 +147,24 @@ public class BattleUnit : MonoBehaviour
 
     public virtual void Special_1()
     {
-        Debug.Log("Primary Special");
+       // Debug.Log("Primary Special");
     }
     public virtual void Special_2()
     {
-        Debug.Log("Secondary Special");
+
+        //Debug.Log("Secondary Special");
     }
 
     public virtual void Cheer()
     {
-        Debug.Log("Cheer");
+       // Debug.Log("Cheer");
     }
 
     public void Act()
     {
-        AttackQueued.OnCast.Invoke(Target, Lane); 
+        AttackQueued.OnCast.Invoke(Target, Lane);
+        AttackQueued = null;
+        Target = null; 
     }
 
     public void OnSelect()

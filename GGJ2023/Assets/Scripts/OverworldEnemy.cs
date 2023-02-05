@@ -1,11 +1,13 @@
 ﻿using UnityEngine;
 using Managers;
-using System.Collections.Generic; 
+using System.Collections.Generic;
 
 [System.Serializable]
 public struct Stats
 {
-    public int Health; 
+    public int maxHealth, health;
+    public int MaxHealth { get => maxHealth; set => maxHealth = value;}
+    public int Health { get => health; set => health = value;  }
 }
 
 namespace Interactables
